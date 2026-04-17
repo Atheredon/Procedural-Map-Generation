@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightmap, float HeightMultiplier, AnimationCurve heightCurve)
+    public static MeshData GenerateTerrainMesh(float[,] heightmap, float HeightMultiplier, AnimationCurve heightCurve, int levelOfDetail)
     {
         int width = heightmap.GetLength(0);
         int height = heightmap.GetLength(1);
@@ -11,22 +11,30 @@ public static class MeshGenerator
         float topLeftX = ((float)width - 1.0f) / -2.0f;
         float topLeftZ = ((float)height - 1.0f) / 2.0f;
 
+        int meshSimplificationIncrement; //level of detail is 0-6, the numbers divisible by our chunksize(240) are 1,2,4,6,8,10,12
+        if (levelOfDetail == 0)
+            meshSimplificationIncrement = 1;
+        else
+            meshSimplificationIncrement = levelOfDetail * 2;
+
+        int verticesPerLine = (width - 1) / meshSimplificationIncrement + 1;
+
         MeshData meshData = new MeshData(width, height);
         int vertexIndex = 0;
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; y+= meshSimplificationIncrement)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < width; x+= meshSimplificationIncrement)
             {
-                meshData.vertices[y * width + x] = new Vector3(topLeftX + x, heightCurve.Evaluate(heightmap[x, y]) * HeightMultiplier, topLeftZ -y);
+                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightCurve.Evaluate(heightmap[x, y]) * HeightMultiplier, topLeftZ -y);
 
                 meshData.uvs[vertexIndex] = new Vector2( (float)x / (float)width, (float)y / (float)height);
 
                 if(x < width - 1 && y < height - 1)
                 {
-                    meshData.AddTriangle(vertexIndex, vertexIndex + width + 1, vertexIndex + width);   //      a -- b
-                    meshData.AddTriangle(vertexIndex + width + 1, vertexIndex, vertexIndex + 1);      //       |    |     tri1: a -> d -> c , tri2: d -> a -> b
-                                                                                                     //        c -- d
+                    meshData.AddTriangle(vertexIndex, vertexIndex + verticesPerLine + 1, vertexIndex + verticesPerLine);   //      a --- b
+                    meshData.AddTriangle(vertexIndex + verticesPerLine + 1, vertexIndex, vertexIndex + 1);                //       |  \  |     tri1: a -> d -> c , tri2: d -> a -> b
+                                                                                                                         //        c --- d
                 }
                 vertexIndex++;
             }
