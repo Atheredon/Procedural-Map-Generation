@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightmap, float HeightMultiplier, AnimationCurve heightCurve, int levelOfDetail)
+    public static MeshData GenerateTerrainMesh(float[,] heightmap, float HeightMultiplier, AnimationCurve _heightCurve, int levelOfDetail)
     {
         int width = heightmap.GetLength(0);
         int height = heightmap.GetLength(1);
@@ -10,6 +10,8 @@ public static class MeshGenerator
         //To Center Mesh into the screen
         float topLeftX = ((float)width - 1.0f) / -2.0f;
         float topLeftZ = ((float)height - 1.0f) / 2.0f;
+
+        AnimationCurve heightCurve = new AnimationCurve(_heightCurve.keys);//Curve response is not reliable when threading. Creating a copy of the curve for every thread
 
         int meshSimplificationIncrement; //level of detail is 0-6, the numbers divisible by our chunksize(240) are 1,2,4,6,8,10,12
         if (levelOfDetail == 0)
