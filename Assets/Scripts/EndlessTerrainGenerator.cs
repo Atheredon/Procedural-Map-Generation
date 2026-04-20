@@ -22,7 +22,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
     int chunksVisibleInView;
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
-    List<TerrainChunk> terrainChunksVisableLastUpdate = new List<TerrainChunk>();
+    static List<TerrainChunk> terrainChunksVisableLastUpdate = new List<TerrainChunk>();
 
     private void Start()
     {
@@ -66,9 +66,6 @@ public class EndlessTerrainGenerator : MonoBehaviour
                 if (terrainChunkDictionary.ContainsKey(viewedChunkCord))
                 {
                     terrainChunkDictionary[viewedChunkCord].UpdateChunk();
-
-                    if (terrainChunkDictionary[viewedChunkCord].isVisiable())
-                        terrainChunksVisableLastUpdate.Add(terrainChunkDictionary[viewedChunkCord]);
                 }
                 else
                 {
@@ -158,6 +155,8 @@ public class EndlessTerrainGenerator : MonoBehaviour
                             lodMesh.RequestMesh(mapData);
                         }
                     }
+
+                    terrainChunksVisableLastUpdate.Add(this);
 
                 }
 
