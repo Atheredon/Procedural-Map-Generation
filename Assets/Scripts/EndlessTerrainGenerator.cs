@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EndlessTerrainGenerator : MonoBehaviour
 {
+    const float scale = 1f;
+
     public static float maxViewDistance;
     public Transform viewer;
 
@@ -36,7 +38,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
 
     private void Update()
     {
-        viewerPosition = new Vector2(viewer.position.x, viewer.position.z);
+        viewerPosition = new Vector2(viewer.position.x, viewer.position.z) / scale;
 
         if((oldViewerPosition - viewerPosition).sqrMagnitude > sqrMoveThresholdBeforeUpdate)
         {
@@ -106,8 +108,9 @@ public class EndlessTerrainGenerator : MonoBehaviour
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshRenderer.material = material;
-            meshObject.transform.position = position3D;
+            meshObject.transform.position = position3D * scale;
             meshObject.transform.parent = parent;
+            meshObject.transform.localScale = Vector3.one * scale;
             SetVisibility(false);
 
             lodMeshes = new LODMesh[detailLevels.Length];

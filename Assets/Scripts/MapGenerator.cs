@@ -8,6 +8,8 @@ public class MapGenerator : MonoBehaviour
     public enum DrawMode { NoiseMap, ColourMap , Mesh}
     public DrawMode drawMode;
 
+    public Noise.NormalizeMode normalizeMode;
+
     public const int mapChunkSize = 241; //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers i choose 241 (number of connections is w -1 so 240)
     [Range(0,6)]
     public int PreviewLOD;
@@ -33,7 +35,7 @@ public class MapGenerator : MonoBehaviour
 
     MapData GenerateMapData(Vector2 center)
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, mapScale, octaves, persistance, lacunarity, center + offset);
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, mapScale, octaves, persistance, lacunarity, center + offset, normalizeMode);
 
         Color[] colourmap = new Color[noiseMap.Length];
 
@@ -44,11 +46,10 @@ public class MapGenerator : MonoBehaviour
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) 
                 {
-                    if (currentHeight <= regions[i].MaxHeight)
-                    {
+                    if (currentHeight >= regions[i].MaxHeight)
                         colourmap[y * mapChunkSize + x] = regions[i].colour;
+                    else 
                         break;
-                    }
                 }
             }
         }
