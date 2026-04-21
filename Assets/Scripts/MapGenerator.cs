@@ -8,27 +8,14 @@ public class MapGenerator : MonoBehaviour
     public enum DrawMode { NoiseMap, ColourMap , Mesh, FallofMap}
     public DrawMode drawMode;
 
-    public Noise.NormalizeMode normalizeMode;
-
     public const int mapChunkSize = 239; //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers i choose 241 (number of connections is w -1 so 240) + -2 for calculating normals
     [Range(0,6)]
     public int PreviewLOD;
-    public float mapScale;
-
-    public int octaves;
-    [Range(0,1)]
-    public float persistance;
-    public float lacunarity;
-
-    public int seed;
-    public Vector2 offset;
-
-    public float meshHightMultiplier;
-    public AnimationCurve meshHeightCurve;
-
-    public bool useFallofMap;
 
     public bool autoUpdate;
+
+    public TerrainData terrainData;
+    public NoiseData noiseData;
 
     public TerrainType[] regions;
 
@@ -42,9 +29,17 @@ public class MapGenerator : MonoBehaviour
         fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
     }
 
+    void OnValuesUpdate()
+    {
+        if (!Application.isPlaying)
+        {
+            DrawMapInEditor();
+        }
+    }
+
     MapData GenerateMapData(Vector2 center)
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, seed, mapScale, octaves, persistance, lacunarity, center + offset, normalizeMode);
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.mapScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, center + noiseData.offset, noiseData.normalizeMode);
 
         Color[] colourmap = new Color[noiseMap.Length];
 
@@ -52,7 +47,7 @@ public class MapGenerator : MonoBehaviour
         {
             for(int x = 0; x < mapChunkSize; x++) 
             {
-                if (useFallofMap)
+                if (terrainData.useFallofMap)
                 {
                     noiseMap[x,y] = Mathf.Clamp01(noiseMap[x,y] - fallofMap[x,y]);
                 }
@@ -72,6 +67,9 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMapInEditor()
     {
+        if (noiseData == null || terrainData == null)
+            return;
+
         MapData mapData = GenerateMapData(Vector2.zero);
 
         MapDisplay display = FindAnyObjectByType<MapDisplay>();
@@ -85,7 +83,7 @@ public class MapGenerator : MonoBehaviour
         }
         else if (drawMode == DrawMode.Mesh)
         {
-            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHightMultiplier, meshHeightCurve, PreviewLOD), TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
+            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD), TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
         }
         else if (drawMode == DrawMode.FallofMap)
         {
@@ -124,7 +122,7 @@ public class MapGenerator : MonoBehaviour
 
     void MeshDataThread(MapData mapData, int lod, Action<MeshData> callback)
     {
-        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHightMultiplier, meshHeightCurve, lod);
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, lod);
         lock (meshDataThreadInfoQueue)
         {
             meshDataThreadInfoQueue.Enqueue(new MapThreadInfo<MeshData>(callback, meshData));
@@ -155,10 +153,16 @@ public class MapGenerator : MonoBehaviour
     //SafeSwitches
     private void OnValidate()
     {
-        if(lacunarity< 1)
-            lacunarity = 1;
-        if(octaves < 0)
-            octaves = 0;
+        if(terrainData != null)
+        {
+            terrainData.OnUpdate -= OnValuesUpdate; //to prevent suscribeing over and over
+            terrainData.OnUpdate += OnValuesUpdate;
+        }
+        if (noiseData != null)
+        {
+            noiseData.OnUpdate -= OnValuesUpdate; //to prevent suscribeing over and over
+            noiseData.OnUpdate += OnValuesUpdate;
+        }
 
         fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
     }
