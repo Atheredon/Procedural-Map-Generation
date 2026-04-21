@@ -87,9 +87,11 @@ public class EndlessTerrainGenerator : MonoBehaviour
 
         MeshRenderer meshRenderer;
         MeshFilter meshFilter;
+        MeshCollider meshCollider;
 
         LODInfo[] detailLevels;
         LODMesh[] lodMeshes;
+        LODMesh collisionLODMesh;
 
         MapData mapData;
         bool mapDataRecived;
@@ -107,6 +109,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
             meshObject = new GameObject("Terrain Chunk");
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
+            meshCollider = meshObject.AddComponent<MeshCollider>();
             meshRenderer.material = material;
             meshObject.transform.position = position3D * scale;
             meshObject.transform.parent = parent;
@@ -117,6 +120,9 @@ public class EndlessTerrainGenerator : MonoBehaviour
             for (int i = 0; i < detailLevels.Length; i++) 
             {
                 lodMeshes[i] = new LODMesh(detailLevels[i].lod, UpdateChunk);
+
+                if (detailLevels[i].useForColider)
+                    collisionLODMesh = lodMeshes[i];
             }
 
             mapGenerator.RequestMapData(position, OnMapDataRecived);
@@ -156,6 +162,17 @@ public class EndlessTerrainGenerator : MonoBehaviour
                         else if (!lodMesh.hasRequestedMesh)
                         {
                             lodMesh.RequestMesh(mapData);
+                        }
+                    }
+
+                    if(lodIndex == 0)
+                    {
+                        if(collisionLODMesh.hasMesh)
+                        {
+                            meshCollider.sharedMesh = collisionLODMesh.mesh;
+                        }else if (!collisionLODMesh.hasRequestedMesh)
+                        {
+                            collisionLODMesh.RequestMesh(mapData);
                         }
                     }
 
@@ -226,6 +243,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
     {
         public int lod;
         public float visibleDistanceThreshold;
+        public bool useForColider;
     }
 
 }

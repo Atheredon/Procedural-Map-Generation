@@ -73,6 +73,9 @@ public static class MeshGenerator
                 vertexIndex++;
             }
         }
+
+        meshData.BakeNormals();
+
         return meshData;
     }
 
@@ -84,6 +87,8 @@ public class MeshData
     int[] triangles;
 
     Vector2[] uvs;
+
+    Vector3[] bakedNormals;
 
     Vector3[] borderVertices;
     int[] borderTriangles;
@@ -209,6 +214,11 @@ public class MeshData
         Vector3 sideAC = pointC - pointA;
 
         return Vector3.Cross(sideAB, sideAC).normalized;
+    }
+
+    public void BakeNormals()
+    {
+        bakedNormals = CalculateNormals();
     }
 
 }
