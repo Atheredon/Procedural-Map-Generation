@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NoiseData
   autoUpdate: 1
   mapScale: 40
-  octaves: 4
-  persistance: 0.302
+  octaves: 8
+  persistance: 0.2
   lacunarity: 2
   seed: 31
   offset: {x: 25, y: 25}

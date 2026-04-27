@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-    public enum DrawMode { NoiseMap, ColourMap , Mesh, FallofMap}
+    public enum DrawMode { NoiseMap, Mesh, FallofMap}
     public DrawMode drawMode;
 
     public const int mapChunkSize = 239; //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers i choose 241 (number of connections is w -1 so 240) + -2 for calculating normals
@@ -16,8 +16,6 @@ public class MapGenerator : MonoBehaviour
 
     public TerrainData terrainData;
     public NoiseData noiseData;
-
-    public TerrainType[] regions;
 
     float[,] fallofMap;
 
@@ -41,8 +39,6 @@ public class MapGenerator : MonoBehaviour
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.mapScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, center + noiseData.offset, noiseData.normalizeMode);
 
-        Color[] colourmap = new Color[noiseMap.Length];
-
         for (int y = 0; y < mapChunkSize; y++) 
         {
             for(int x = 0; x < mapChunkSize; x++) 
@@ -51,18 +47,10 @@ public class MapGenerator : MonoBehaviour
                 {
                     noiseMap[x,y] = Mathf.Clamp01(noiseMap[x,y] - fallofMap[x,y]);
                 }
-                float currentHeight = noiseMap[x, y];
-                for (int i = 0; i < regions.Length; i++) 
-                {
-                    if (currentHeight >= regions[i].MaxHeight)
-                        colourmap[y * mapChunkSize + x] = regions[i].colour;
-                    else 
-                        break;
-                }
             }
         }
 
-        return new MapData(noiseMap, colourmap);
+        return new MapData(noiseMap);
     }
 
     public void DrawMapInEditor()
@@ -77,13 +65,9 @@ public class MapGenerator : MonoBehaviour
         {
             display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData.heightMap));
         }
-        else if (drawMode == DrawMode.ColourMap)
-        {
-            display.DrawTexture(TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
-        }
         else if (drawMode == DrawMode.Mesh)
         {
-            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD), TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
+            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD), Texture2D.whiteTexture);
         }
         else if (drawMode == DrawMode.FallofMap)
         {
@@ -181,22 +165,12 @@ public class MapGenerator : MonoBehaviour
 
 }
 
-[System.Serializable]
-public struct TerrainType
-{
-    public string name;
-    public float MaxHeight;
-    public Color colour;
-}
-
 public struct MapData
 {
     public readonly float[,] heightMap;
-    public readonly Color[] colourMap;
 
-    public MapData(float[,] heightMap, Color[] colourMap)
+    public MapData(float[,] heightMap)
     {
         this.heightMap = heightMap;
-        this.colourMap = colourMap;
     }
 }

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: DefaultTerrain
   m_EditorClassIdentifier: Assembly-CSharp::TerrainData
   autoUpdate: 1
-  meshHightMultiplier: 40
+  meshHightMultiplier: 50
   meshHeightCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -27,58 +27,49 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.45173067
-      value: 0.0034328988
-      inSlope: 0.019354567
-      outSlope: 0.019354567
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.10758746
-    - serializedVersion: 3
-      time: 0.55535895
-      value: 0.08636975
-      inSlope: 0.017373636
-      outSlope: 0.017373636
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 1
-    - serializedVersion: 3
-      time: 0.6604708
-      value: 0.2369262
-      inSlope: 0.4911512
-      outSlope: 0.4911512
-      tangentMode: 0
+      time: 0.2
+      value: 0.2
+      inSlope: 0.5
+      outSlope: 0.5
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.8613976
-      value: 0.5143439
-      inSlope: 2.0084236
-      outSlope: 2.0084236
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.22094995
-      outWeight: 0.050217923
-    - serializedVersion: 3
-      time: 0.99675494
-      value: 0.7823703
-      inSlope: 1.5896639
-      outSlope: 1.5896639
-      tangentMode: 0
+      time: 0.4
+      value: 0.3
+      inSlope: 0.5
+      outSlope: 0.5
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.081202246
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2.0649984
-      value: 2.0198383
-      inSlope: 3.6190865
-      outSlope: 3.6190865
+      time: 0.7
+      value: 0.45
+      inSlope: 0.75
+      outSlope: 0.75
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0.75
+      inSlope: 0.875
+      outSlope: 0.875
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 1.5
+      inSlope: 0.4227115
+      outSlope: 0.4227115
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.07206255
+      inWeight: 0.08760488
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

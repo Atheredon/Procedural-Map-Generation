@@ -4,6 +4,10 @@ using UnityEngine;
 public class EndlessTerrainGenerator : MonoBehaviour
 {
     public static float maxViewDistance;
+
+    public float waterLevel = 15f;
+    public GameObject waterPrefab;
+
     public Transform viewer;
 
     public static Vector2 viewerPosition;
@@ -69,7 +73,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
                 }
                 else
                 {
-                    terrainChunkDictionary.Add(viewedChunkCord, new TerrainChunk(viewedChunkCord, chunkSize, detailLevels, transform, mapMaterial));
+                    terrainChunkDictionary.Add(viewedChunkCord, new TerrainChunk(viewedChunkCord, chunkSize, detailLevels, transform, mapMaterial, waterPrefab, waterLevel));
                 }
 
             }
@@ -96,7 +100,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
 
         int previousLODIndex = -1;
 
-        public TerrainChunk(Vector2 cord, int size, LODInfo[] detailLevels,Transform parent, Material material)
+        public TerrainChunk(Vector2 cord, int size, LODInfo[] detailLevels,Transform parent, Material material, GameObject waterPrefab, float waterLevel)
         {
             this.detailLevels = detailLevels;
 
@@ -122,6 +126,11 @@ public class EndlessTerrainGenerator : MonoBehaviour
                 if (detailLevels[i].useForColider)
                     collisionLODMesh = lodMeshes[i];
             }
+
+            GameObject chunksWater = GameObject.Instantiate(waterPrefab);
+            chunksWater.transform.parent = meshObject.transform;
+            chunksWater.transform.position = meshObject.transform.position + Vector3.up * waterLevel * mapGenerator.terrainData.uniformScale;
+            chunksWater.transform.localScale = Vector3.one * 5f;
 
             mapGenerator.RequestMapData(position, OnMapDataRecived);
         }
@@ -196,9 +205,6 @@ public class EndlessTerrainGenerator : MonoBehaviour
         {
             this.mapData = mapData;
             mapDataRecived = true;
-
-            Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.colourMap, MapGenerator.mapChunkSize, MapGenerator.mapChunkSize);
-            meshRenderer.material.mainTexture = texture;
 
             UpdateChunk();
         }
