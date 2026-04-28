@@ -8,8 +8,10 @@ public class MapGenerator : MonoBehaviour
     public enum DrawMode { NoiseMap, Mesh, FallofMap}
     public DrawMode drawMode;
 
-    public const int mapChunkSize = 239; //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers i choose 241 (number of connections is w -1 so 240) + -2 for calculating normals
-    [Range(0,6)]
+    [Range(0, MeshGenerator.numberOfSuportedChunkSizes - 1)]
+    public int chunkSizeIndex;
+
+    [Range(0, MeshGenerator.numberOfSuportedLODs - 1)]
     public int PreviewLOD;
 
     public bool autoUpdate;
@@ -22,10 +24,8 @@ public class MapGenerator : MonoBehaviour
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
-    private void Awake()
-    {
-        fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
-    }
+    public int mapChunkSize { get => MeshGenerator.suportedChunkSizes[chunkSizeIndex] - 1; }
+
 
     void OnValuesUpdate()
     {
@@ -39,13 +39,16 @@ public class MapGenerator : MonoBehaviour
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.mapScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, center + noiseData.offset, noiseData.normalizeMode);
 
-        for (int y = 0; y < mapChunkSize; y++) 
+        if (terrainData.useFallofMap)
         {
-            for(int x = 0; x < mapChunkSize; x++) 
+            if(fallofMap == null)
+                fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize + 2);
+
+            for (int y = 0; y < mapChunkSize + 2; y++)
             {
-                if (terrainData.useFallofMap)
+                for (int x = 0; x < mapChunkSize + 2; x++)
                 {
-                    noiseMap[x,y] = Mathf.Clamp01(noiseMap[x,y] - fallofMap[x,y]);
+                    noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - fallofMap[x, y]);
                 }
             }
         }
@@ -67,7 +70,7 @@ public class MapGenerator : MonoBehaviour
         }
         else if (drawMode == DrawMode.Mesh)
         {
-            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD), Texture2D.whiteTexture);
+            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD));
         }
         else if (drawMode == DrawMode.FallofMap)
         {
@@ -147,8 +150,6 @@ public class MapGenerator : MonoBehaviour
             noiseData.OnUpdate -= OnValuesUpdate; //to prevent suscribeing over and over
             noiseData.OnUpdate += OnValuesUpdate;
         }
-
-        fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
     }
 
     struct MapThreadInfo<T>

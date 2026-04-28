@@ -31,9 +31,9 @@ public class EndlessTerrainGenerator : MonoBehaviour
     private void Start()
     {
         maxViewDistance = detailLevels[detailLevels.Length - 1].visibleDistanceThreshold;
-        chunkSize = MapGenerator.mapChunkSize - 1;
-        chunksVisibleInView = Mathf.RoundToInt(maxViewDistance / chunkSize);
         mapGenerator = FindAnyObjectByType<MapGenerator>();
+        chunkSize = mapGenerator.mapChunkSize - 1;
+        chunksVisibleInView = Mathf.RoundToInt(maxViewDistance / chunkSize);
 
         UpdateVisibleChunks();
     }
@@ -130,7 +130,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
             GameObject chunksWater = GameObject.Instantiate(waterPrefab);
             chunksWater.transform.parent = meshObject.transform;
             chunksWater.transform.position = meshObject.transform.position + Vector3.up * waterLevel * mapGenerator.terrainData.uniformScale;
-            chunksWater.transform.localScale = Vector3.one * 5f;
+            chunksWater.transform.localScale = Vector3.one * ((mapGenerator.mapChunkSize - 1.0f) / 50.0f);
 
             mapGenerator.RequestMapData(position, OnMapDataRecived);
         }
@@ -245,6 +245,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
     [System.Serializable]
     public struct LODInfo
     {
+        [Range(0, MeshGenerator.numberOfSuportedLODs - 1)]
         public int lod;
         public float visibleDistanceThreshold;
         public bool useForColider;

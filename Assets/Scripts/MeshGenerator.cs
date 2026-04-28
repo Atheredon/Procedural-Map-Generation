@@ -2,9 +2,13 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
+    public const int numberOfSuportedLODs = 5;// Limit lod levels to 0 - 4 to be able to create diffrent sized chunks
+    public const int numberOfSuportedChunkSizes = 9;
+    //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers max is 240, as the divisers are 1,2,4,6,8 these are the all of the meaningful values that is smaller than 240 thats divisible by all of them
+    public static readonly int[] suportedChunkSizes = { 48, 72, 96, 120, 144, 168, 192, 216, 240 };
     public static MeshData GenerateTerrainMesh(float[,] heightmap, float HeightMultiplier, AnimationCurve _heightCurve, int levelOfDetail)
     {
-        int meshSimplificationIncrement; //level of detail is 0-6, the numbers divisible by our chunksize(240) are 1,2,4,6,8,10,12
+        int meshSimplificationIncrement; //level of detail is 0-4, the numbers divisible by our chunksizes are 1,2,4,6,8
         if (levelOfDetail == 0)
             meshSimplificationIncrement = 1;
         else
