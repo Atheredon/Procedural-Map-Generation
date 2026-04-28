@@ -1,15 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class MapGenerator : MonoBehaviour
 {
+<<<<<<< Updated upstream
     public enum DrawMode { NoiseMap, ColourMap , Mesh, FallofMap}
+=======
+    public enum DrawMode { NoiseMap, Mesh, FallofMap }
+>>>>>>> Stashed changes
     public DrawMode drawMode;
 
-    public const int mapChunkSize = 239; //Max mesh size in unity 255^2 to make an square and make sure vertices count is divisible by even numbers i choose 241 (number of connections is w -1 so 240) + -2 for calculating normals
-    [Range(0,6)]
+    [Range(0, MeshGenerator.numberOfSuportedChunkSizes - 1)]
+    public int chunkSizeIndex;
+
+    [Range(0,MeshGenerator.numberOfSuportedLODs - 1)]
     public int PreviewLOD;
 
     public bool autoUpdate;
@@ -24,10 +32,8 @@ public class MapGenerator : MonoBehaviour
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
-    private void Awake()
-    {
-        fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
-    }
+    //number of connections is size - 1 so need + 1 amount of vertices + -2 for calculating normals so total values must be -1 of divisible chunk sizes
+    public int mapChunkSize { get => MeshGenerator.suportedChunkSizes[chunkSizeIndex] - 1; }
 
     void OnValuesUpdate()
     {
@@ -41,15 +47,25 @@ public class MapGenerator : MonoBehaviour
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, noiseData.seed, noiseData.mapScale, noiseData.octaves, noiseData.persistance, noiseData.lacunarity, center + noiseData.offset, noiseData.normalizeMode);
 
+<<<<<<< Updated upstream
         Color[] colourmap = new Color[noiseMap.Length];
 
         for (int y = 0; y < mapChunkSize; y++) 
+=======
+        if (terrainData.useFallofMap)
+>>>>>>> Stashed changes
         {
-            for(int x = 0; x < mapChunkSize; x++) 
+
+            if(fallofMap == null)
             {
-                if (terrainData.useFallofMap)
+                fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize + 2);
+            }
+
+            for (int y = 0; y < mapChunkSize + 2; y++)
+            {
+                for (int x = 0; x < mapChunkSize + 2; x++)
                 {
-                    noiseMap[x,y] = Mathf.Clamp01(noiseMap[x,y] - fallofMap[x,y]);
+                    noiseMap[x, y] = Mathf.Clamp01(noiseMap[x, y] - fallofMap[x, y]);
                 }
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) 
@@ -60,6 +76,7 @@ public class MapGenerator : MonoBehaviour
                         break;
                 }
             }
+
         }
 
         return new MapData(noiseMap, colourmap);
@@ -83,7 +100,11 @@ public class MapGenerator : MonoBehaviour
         }
         else if (drawMode == DrawMode.Mesh)
         {
+<<<<<<< Updated upstream
             display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD), TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize));
+=======
+            display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, terrainData.meshHightMultiplier, terrainData.meshHeightCurve, PreviewLOD));
+>>>>>>> Stashed changes
         }
         else if (drawMode == DrawMode.FallofMap)
         {
@@ -163,8 +184,6 @@ public class MapGenerator : MonoBehaviour
             noiseData.OnUpdate -= OnValuesUpdate; //to prevent suscribeing over and over
             noiseData.OnUpdate += OnValuesUpdate;
         }
-
-        fallofMap = FallofGenerator.GenerateFallofMap(mapChunkSize);
     }
 
     struct MapThreadInfo<T>
