@@ -1,25 +1,33 @@
 using UnityEngine;
 
 [CreateAssetMenu]
-public class NoiseData : UpdateableData
+public class HeightMapSettings : UpdateableData
 {
-    public float mapScale;
+    public NoiseSettings noiseSettings;
 
-    public int octaves;
-    [Range(0, 1)]
-    public float persistance;
-    public float lacunarity;
-    public int seed;
-    public Vector2 offset;
+    public float hightMultiplier;
+    public AnimationCurve heightCurve;
+    public bool useFallofMap;
 
-    public Noise.NormalizeMode normalizeMode;
+    public float minHeight
+    {
+        get
+        {
+            return hightMultiplier * heightCurve.Evaluate(0);
+        }
+    }
+
+    public float maxHeight
+    {
+        get
+        {
+            return hightMultiplier * heightCurve.Evaluate(1);
+        }
+    }
 
     protected override void OnValidate()
     {
-        if (lacunarity < 1)
-            lacunarity = 1;
-        if (octaves < 0)
-            octaves = 0;
+        noiseSettings.ValidateValues();
 
         base.OnValidate();
     }
