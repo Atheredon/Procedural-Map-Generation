@@ -54,12 +54,10 @@ public class MapGenerator : MonoBehaviour
 
     public void RequestHeightMap(Vector2 center, Action<HeightMap> callback)
     {
-        ThreadStart threadStart = delegate
+        ThreadPool.QueueUserWorkItem(delegate
         {
             HeightMapThread(center, callback);
-        };
-
-        new Thread(threadStart).Start();
+        });
     }
 
     void HeightMapThread(Vector2 center, Action<HeightMap> callback)
@@ -73,12 +71,10 @@ public class MapGenerator : MonoBehaviour
 
     public void RequestMeshData(HeightMap heightMap, int lod, Action<MeshData> callback)
     {
-        ThreadStart threadStart = delegate
+        ThreadPool.QueueUserWorkItem(delegate
         {
             MeshDataThread(heightMap, lod, callback);
-        };
-
-        new Thread(threadStart).Start();
+        });
     }
 
     void MeshDataThread(HeightMap heightMap, int lod, Action<MeshData> callback)

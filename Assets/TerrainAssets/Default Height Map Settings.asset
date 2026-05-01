@@ -21,7 +21,7 @@ MonoBehaviour:
     lacunarity: 2
     seed: 31
     offset: {x: 25, y: 25}
-  hightMultiplier: 50
+  heightMultiplier: 50
   heightCurve:
     serializedVersion: 2
     m_Curve:

@@ -20,7 +20,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
 
     static MapGenerator mapGenerator;
 
-    const float coliderGenerationDistance = 5f;
+    const float coliderGenerationDistance = 10f;
 
     const float moveThresholdBeforeUpdate = 25.0f;
     const float sqrMoveThresholdBeforeUpdate = moveThresholdBeforeUpdate * moveThresholdBeforeUpdate;
@@ -67,8 +67,10 @@ public class EndlessTerrainGenerator : MonoBehaviour
         HashSet<Vector2> allreadyUpdatedChunkCords = new HashSet<Vector2>();
         for(int i = visibleTerrainChunks.Count -1; i >= 0; i--)
         {
-            visibleTerrainChunks[i].UpdateChunk();
-            allreadyUpdatedChunkCords.Add(visibleTerrainChunks[i].cord);
+            TerrainChunk chunk = visibleTerrainChunks[i];
+
+            chunk.UpdateChunk();
+            allreadyUpdatedChunkCords.Add(chunk.cord);
         }
 
         int currentChunkCordX = Mathf.RoundToInt(viewerPosition.x / meshWorldSize);
@@ -137,7 +139,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
             meshRenderer.material = material;
             meshObject.transform.position = new Vector3(position.x, 0, position.y);
             meshObject.transform.parent = parent;
-            meshObject.transform.localScale = Vector3.one * mapGenerator.meshSettings.meshScale;
+            meshObject.transform.localScale = Vector3.one;
             SetVisibility(false);
 
             lodMeshes = new LODMesh[detailLevels.Length];
@@ -155,7 +157,7 @@ public class EndlessTerrainGenerator : MonoBehaviour
             GameObject chunksWater = GameObject.Instantiate(waterPrefab);
             chunksWater.transform.parent = meshObject.transform;
             chunksWater.transform.position = meshObject.transform.position + Vector3.up * waterLevel * mapGenerator.meshSettings.meshScale;
-            chunksWater.transform.localScale = Vector3.one * ((mapGenerator.meshSettings.meshWorldSize - 1.0f) / 49.55f);
+            chunksWater.transform.localScale = Vector3.one * ((mapGenerator.meshSettings.meshWorldSize) / 50f);
 
             mapGenerator.RequestHeightMap(sampleCenter, OnMapDataRecived);
         }
@@ -199,8 +201,6 @@ public class EndlessTerrainGenerator : MonoBehaviour
                             lodMesh.RequestMesh(mapData);
                         }
                     }
-
-                    visibleTerrainChunks.Add(this);
 
                 }
 

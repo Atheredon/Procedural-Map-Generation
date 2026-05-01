@@ -5,7 +5,7 @@ public class HeightMapSettings : UpdateableData
 {
     public NoiseSettings noiseSettings;
 
-    public float hightMultiplier;
+    public float heightMultiplier;
     public AnimationCurve heightCurve;
     public bool useFallofMap;
 
@@ -13,7 +13,7 @@ public class HeightMapSettings : UpdateableData
     {
         get
         {
-            return hightMultiplier * heightCurve.Evaluate(0);
+            return heightMultiplier * heightCurve.Evaluate(0);
         }
     }
 
@@ -21,7 +21,7 @@ public class HeightMapSettings : UpdateableData
     {
         get
         {
-            return hightMultiplier * heightCurve.Evaluate(1);
+            return heightMultiplier * heightCurve.Evaluate(1);
         }
     }
 

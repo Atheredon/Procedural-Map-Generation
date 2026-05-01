@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MeshSettings
   autoUpdate: 1
   meshScale: 1
-  chunkSizeIndex: 8
+  chunkSizeIndex: 4

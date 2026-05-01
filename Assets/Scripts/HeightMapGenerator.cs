@@ -15,7 +15,7 @@ public static class HeightMapGenerator
         {
             for (int j = 0; j < height; j++) 
             {
-                values[i,j] *= heightCurve_threadsafe.Evaluate(values[i, j])* settings.hightMultiplier;
+                values[i,j] *= heightCurve_threadsafe.Evaluate(values[i, j])* settings.heightMultiplier;
 
                 if (values[i,j] > maxValue) maxValue = values[i,j];
                 if(values[i,j] < minValue) minValue = values[i,j];
