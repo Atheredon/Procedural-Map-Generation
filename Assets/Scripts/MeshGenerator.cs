@@ -51,9 +51,21 @@ public static class MeshGenerator
             {
                 int vertexIndex = vertexIndicesMap[x, y];
 
-                Vector2 percent = new Vector2(((float)x - meshSimplificationIncrement) / (float)meshSize, ((float)y - meshSimplificationIncrement) / (float)meshSize);
-                float height = heightmap[x, y];
-                Vector3 vertexPosition = new Vector3((topLeftX + percent.x * meshSizeUnsimlified) * meshSettings.meshScale, height, (topLeftZ - percent.y * meshSizeUnsimlified) * meshSettings.meshScale);
+                Vector2 percent = new Vector2(((float)x - meshSimplificationIncrement) / (float)(meshSize - 1), ((float)y - meshSimplificationIncrement) / (float)(meshSize - 1));
+
+                // Edge Sealing
+                int sampleX = x;
+                int sampleY = y;
+
+                // If we are at the edge, we calculate height from max and min borders (1 and borderedSize - 2).
+                if (x == meshSimplificationIncrement) sampleX = 1;
+                if (x == borderedSize - 1 - meshSimplificationIncrement) sampleX = borderedSize - 2;
+                if (y == meshSimplificationIncrement) sampleY = 1;
+                if (y == borderedSize - 1 - meshSimplificationIncrement) sampleY = borderedSize - 2;
+
+                float height = heightmap[sampleX, sampleY];
+
+                Vector3 vertexPosition = new Vector3((topLeftX + percent.x * (meshSizeUnsimlified - 1)) * meshSettings.meshScale, height, (topLeftZ - percent.y * (meshSizeUnsimlified - 1)) * meshSettings.meshScale);
 
                 meshData.AddVertex(vertexPosition, percent, vertexIndex);
 
